@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MoodSurveyResponse</title>
+  <style>
+    :root{
+      --brand:#3a64b8;
+      --tile:#466fbe;
+      --tileActive:#0b1a7a;
+      --bg:#f4f6fb;
+      --text:#0f172a;
+      --border:#c7c7c7;
+      --btnDisabled:#d6d6d6;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: -apple-system, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .topbar{
+      background: var(--brand);
+      color:#fff;
+      padding: 18px 28px;
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: .2px;
+    }
+
+    .wrap{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 24px 40px;
+      text-align:center;
+    }
+
+    h1{
+      margin: 10px 0 26px;
+      font-size: clamp(40px, 6vw, 86px);
+      font-weight: 800;
+      color:#000;
+    }
+
+    .mood-grid{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      gap: 26px;
+      max-width: 980px;
+      margin: 0 auto 34px;
+    }
+
+    .tile{
+      background: var(--tile);
+      border-radius: 12px;
+      height: 220px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border: 4px solid rgba(0,0,0,.08);
+      box-shadow: 0 6px 16px rgba(0,0,0,.08);
+      cursor:pointer;
+      user-select:none;
+      transition: transform .08s ease, filter .08s ease, background .08s ease;
+    }
+    .tile:active{ transform: scale(.99); }
+
+    .tile.active{
+      background: var(--tileActive);
+      filter: saturate(1.05);
+    }
+
+    .emoji{
+      font-size: 92px;
+      line-height: 1;
+      transform: translateY(2px);
+    }
+
+    h2{
+      margin: 22px 0 14px;
+      font-size: 44px;
+      font-weight: 800;
+      color:#000;
+    }
+
+    .why-row{
+      display:flex;
+      justify-content:center;
+      gap: 28px;
+      flex-wrap:wrap;
+      margin: 10px 0 26px;
+    }
+
+    .why-btn{
+      width: 320px;
+      max-width: 90vw;
+      padding: 16px 20px;
+      font-size: 36px;
+      font-weight: 700;
+      border-radius: 10px;
+      border: 3px solid var(--border);
+      background: var(--btnDisabled);
+      color:#fff;
+      cursor:pointer;
+      user-select:none;
+      box-shadow: 0 4px 10px rgba(0,0,0,.06);
+    }
+
+    .why-btn.active{
+      background: #6b86c6;
+      border-color: #6b86c6;
+    }
+
+    .submit-wrap{
+      margin-top: 10px;
+      display:flex;
+      justify-content:center;
+    }
+
+    .submit{
+      width: 360px;
+      max-width: 90vw;
+      padding: 18px 20px;
+      font-size: 40px;
+      font-weight: 800;
+      border-radius: 12px;
+      border: 3px solid #b6b6b6;
+      background: #e5e5e5;
+      color: #a8a8a8;
+      cursor:not-allowed;
+    }
+    .submit.enabled{
+      background: #ffffff;
+      color:#111;
+      cursor:pointer;
+    }
+
+    .status{
+      margin-top: 14px;
+      font-size: 16px;
+      color: #334155;
+      min-height: 22px;
+    }
+
+    .hidden{ display:none !important; }
+
+    @media (max-width: 900px){
+      .mood-grid{ grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+      .tile{ height: 200px; }
+      .emoji{ font-size: 84px; }
+      .why-btn{ font-size: 30px; }
+      .submit{ font-size: 34px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">MoodSurveyResponse</div>
+
+  <div class="wrap">
+    <h1>Wie war dein Tag?</h1>
+
+    <div class="mood-grid" id="moodGrid">
+      <div class="tile" data-mood="1" aria-label="Sehr schlecht" role="button" tabindex="0"><div class="emoji">😞</div></div>
+      <div class="tile" data-mood="2" aria-label="Neutral" role="button" tabindex="0"><div class="emoji">😐</div></div>
+      <div class="tile" data-mood="3" aria-label="Gut" role="button" tabindex="0"><div class="emoji">🙂</div></div>
+      <div class="tile" data-mood="4" aria-label="Sehr gut" role="button" tabindex="0"><div class="emoji">😁</div></div>
+    </div>
+
+    <!-- Wird nur gezeigt, wenn Mood=1 -->
+    <div id="whySection" class="hidden">
+      <h2>Warum?</h2>
+
+      <div class="why-row" id="whyRow">
+        <button class="why-btn" type="button" data-reason="Privat">Privat</button>
+        <button class="why-btn" type="button" data-reason="Geschäftlich">Geschäftlich</button>
+        <button class="why-btn" type="button" data-reason="Sonstiges">Sonstiges</button>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button class="submit" id="submitBtn" type="button" disabled>Absenden</button>
+    </div>
+
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    // ✅ HIER deine Apps Script Web-App URL einsetzen:
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbyFXZCclzMBC6lfsDebmqGH3BQuEa_aBjhTKGz_gIPhTVfXdpMgkvTWN3CCTPiHayB6aw/exec";
+
+    let mood = null;     // 1..4
+    let reason = null;   // string
+
+    const moodGrid = document.getElementById("moodGrid");
+    const whySection = document.getElementById("whySection");
+    const whyRow = document.getElementById("whyRow");
+    const submitBtn = document.getElementById("submitBtn");
+    const statusEl = document.getElementById("status");
+
+    function resetReason(){
+      reason = null;
+      [...whyRow.querySelectorAll(".why-btn")].forEach(b => b.classList.remove("active"));
+    }
+
+    function updateUIForMood(){
+      const needsReason = (String(mood) === "1");
+      if(needsReason){
+        whySection.classList.remove("hidden");
+      } else {
+        whySection.classList.add("hidden");
+        resetReason();
+      }
+    }
+
+    function updateSubmitState(){
+      const needsReason = (String(mood) === "1");
+      const ok = !!mood && (needsReason ? !!reason : true);
+
+      submitBtn.disabled = !ok;
+      submitBtn.classList.toggle("enabled", ok);
+      submitBtn.style.cursor = ok ? "pointer" : "not-allowed";
+    }
+
+    function selectMood(m){
+      mood = m;
+      [...moodGrid.querySelectorAll(".tile")].forEach(t => {
+        t.classList.toggle("active", t.dataset.mood === String(m));
+      });
+      updateUIForMood();
+      updateSubmitState();
+    }
+
+    function selectReason(r){
+      reason = r;
+      [...whyRow.querySelectorAll(".why-btn")].forEach(b => {
+        b.classList.toggle("active", b.dataset.reason === r);
+      });
+      updateSubmitState();
+    }
+
+    // Mood click + keyboard
+    moodGrid.addEventListener("click", (e) => {
+      const tile = e.target.closest(".tile");
+      if(!tile) return;
+      selectMood(tile.dataset.mood);
+    });
+    moodGrid.addEventListener("keydown", (e) => {
+      if(e.key !== "Enter" && e.key !== " ") return;
+      const tile = e.target.closest(".tile");
+      if(!tile) return;
+      e.preventDefault();
+      selectMood(tile.dataset.mood);
+    });
+
+    // Why buttons
+    whyRow.addEventListener("click", (e) => {
+      const btn = e.target.closest(".why-btn");
+      if(!btn) return;
+      selectReason(btn.dataset.reason);
+    });
+
+    // Submit -> send to Apps Script
+    submitBtn.addEventListener("click", async () => {
+      const needsReason = (String(mood) === "1");
+      if(!mood) return;
+      if(needsReason && !reason) return;
+
+      submitBtn.disabled = true;
+      statusEl.textContent = "Sende…";
+
+  
+const url = new URL(location.href);
+const device = url.searchParams.get("device") || "ipad-unknown";
+
+// Option A: Kommen/Gehen fix über URL steuern:
+// .../index.html?device=ipad1&kg=kommen
+// .../index.html?device=ipad1&kg=gehen
+
+let kg = (url.searchParams.get("kg") || "").toLowerCase();
+
+if (kg !== "kommen" && kg !== "gehen") {
+  // Option B (Fallback): per Uhrzeit entscheiden
+  kg = (new Date().getHours() < 12) ? "kommen" : "gehen";
+}
+
+// Datum im Format dd/mm/yy
+function formatDateDMY(d){
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth()+1).padStart(2, "0");
+  const yy = String(d.getFullYear()).slice(-2);
+  return `${dd}/${mm}/${yy}`;
+}
+
+const now = new Date();
+
+const fd = new FormData();
+
+fd.append("timestampClient", now.toISOString());
+fd.append("deviceId", device);
+fd.append("KommenGehen", kg);
+fd.append("date", formatDateDMY(now));
+
+fd.append("mood", String(mood));
+fd.append("reason", (String(mood) === "1") ? reason : "");
+
+
+      try{
+        await fetch(ENDPOINT, { method:"POST", mode:"no-cors", body: fd });
+        statusEl.textContent = "Danke! ✅";
+        setTimeout(() => location.reload(), 1200);
+      }catch(err){
+        statusEl.textContent = "Fehler beim Senden. Bitte erneut versuchen.";
+        updateUIForMood();
+        updateSubmitState();
+      }
+    });
+
+    // Init
+    updateUIForMood();
+    updateSubmitState();
+  </script>
+</body>
+</html>
