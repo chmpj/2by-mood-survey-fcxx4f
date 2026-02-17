@@ -87,10 +87,11 @@
     }
 
     .why-btn{
-      width: 320px;
+      width: 300px;
       max-width: 90vw;
-      padding: 16px 20px;
-      font-size: 36px;
+      height: 72px;                 
+      padding: 0 16px;              
+      font-size: 28px;
       font-weight: 700;
       border-radius: 10px;
       border: 3px solid var(--border);
@@ -99,7 +100,14 @@
       cursor:pointer;
       user-select:none;
       box-shadow: 0 4px 10px rgba(0,0,0,.06);
+    
+      display: flex;                
+      align-items: center;
+      justify-content: center;
+    
+      white-space: nowrap;          
     }
+
 
     .why-btn.active{
       background: #6b86c6;
@@ -176,7 +184,8 @@
     }
     
     .compact .why-btn{
-      font-size: 26px;
+      font-size: 24px;
+      height: 60px;
       padding: 12px 14px;
     }
     
@@ -325,17 +334,6 @@
       return `${dd}/${mm}/${yy}`;
     }
 
-    function computeKommenGehen(){
-      // Empfehlung: über URL ?kg=kommen / ?kg=gehen steuern.
-      const url = new URL(location.href);
-      let kg = (url.searchParams.get("kg") || "").toLowerCase();
-      if (kg !== "kommen" && kg !== "gehen") {
-        // Fallback: Uhrzeit
-        kg = (new Date().getHours() < 12) ? "kommen" : "gehen";
-      }
-      return kg;
-    }
-
     // Submit -> send to Apps Script
     submitBtn.addEventListener("click", async () => {
       if(!mood) return;
@@ -349,14 +347,12 @@
 
       const url = new URL(location.href);
       const device = url.searchParams.get("device") || "ipad-unknown";
-      const kg = computeKommenGehen();
 
       const now = new Date();
       const fd = new FormData();
 
       fd.append("timestampClient", now.toISOString());
       fd.append("deviceId", device);
-      fd.append("KommenGehen", kg);
       fd.append("date", formatDateDMY(now));
 
       // Optional: damit du später auch "morning/afternoon" sauber auswerten kannst
@@ -413,5 +409,6 @@
   </script>
 </body>
 </html>
+
 
 
