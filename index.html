@@ -162,7 +162,7 @@
   <div class="topbar">MoodSurveyResponse</div>
 
   <div class="wrap">
-    <h1>Wie war dein Tag?</h1>
+    <h1 id="questionTitle">Wie war dein Tag?</h1>
 
     <div class="mood-grid" id="moodGrid">
       <div class="tile" data-mood="1" aria-label="Sehr schlecht" role="button" tabindex="0"><div class="emoji">😞</div></div>
@@ -171,7 +171,7 @@
       <div class="tile" data-mood="4" aria-label="Sehr gut" role="button" tabindex="0"><div class="emoji">😁</div></div>
     </div>
 
-    <!-- Wird nur gezeigt, wenn Mood=1 -->
+    <!-- Wird nur am Nachmittag UND nur bei Mood=1 gezeigt -->
     <div id="whySection" class="hidden">
       <h2>Warum?</h2>
 
@@ -190,26 +190,43 @@
   </div>
 
   <script>
-    // ✅ HIER deine Apps Script Web-App URL einsetzen:
-    const ENDPOINT = "https://script.google.com/macros/s/AKfycbyFXZCclzMBC6lfsDebmqGH3BQuEa_aBjhTKGz_gIPhTVfXdpMgkvTWN3CCTPiHayB6aw/exec";
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbxc0qWCumrQzsgqupDoeRzuLamS1-dzJAaFuv-HxvKMroJCpPhOj7V_6r1tdlOSMfQpbQ/exec";
 
     let mood = null;     // 1..4
     let reason = null;   // string
 
+    const questionTitle = document.getElementById("questionTitle");
     const moodGrid = document.getElementById("moodGrid");
     const whySection = document.getElementById("whySection");
     const whyRow = document.getElementById("whyRow");
     const submitBtn = document.getElementById("submitBtn");
     const statusEl = document.getElementById("status");
 
+    function isAfternoon(d = new Date()){
+      return d.getHours() >= 12;
+    }
+
+    function setQuestionText(){
+      questionTitle.textContent = isAfternoon() ? "Wie war dein Tag?" : "Wie geht es dir?";
+    }
+
+    function resetAllSelections(){
+      mood = null;
+      reason = null;
+      statusEl.textContent = "";
+      [...moodGrid.querySelectorAll(".tile")].forEach(t => t.classList.remove("active"));
+      [...whyRow.querySelectorAll(".why-btn")].forEach(b => b.classList.remove("active"));
+    }
+
     function resetReason(){
       reason = null;
       [...whyRow.querySelectorAll(".why-btn")].forEach(b => b.classList.remove("active"));
     }
 
+    // Warum nur wenn: Nachmittag UND Mood=1
     function updateUIForMood(){
-      const needsReason = (String(mood) === "1");
-      if(needsReason){
+      const needsWhy = isAfternoon() && (String(mood) === "1");
+      if(needsWhy){
         whySection.classList.remove("hidden");
       } else {
         whySection.classList.add("hidden");
@@ -217,8 +234,12 @@
       }
     }
 
+    // Submit-Regeln:
+    // - Morgen: nur Mood nötig
+    // - Nachmittag: Mood nötig; wenn Mood=1 zusätzlich Reason nötig
     function updateSubmitState(){
-      const needsReason = (String(mood) === "1");
+      const afternoon = isAfternoon();
+      const needsReason = afternoon && (String(mood) === "1");
       const ok = !!mood && (needsReason ? !!reason : true);
 
       submitBtn.disabled = !ok;
@@ -264,50 +285,54 @@
       selectReason(btn.dataset.reason);
     });
 
+    function formatDateDMY(d){
+      const dd = String(d.getDate()).padStart(2, "0");
+      const mm = String(d.getMonth()+1).padStart(2, "0");
+      const yy = String(d.getFullYear()).slice(-2);
+      return `${dd}/${mm}/${yy}`;
+    }
+
+    function computeKommenGehen(){
+      // Empfehlung: über URL ?kg=kommen / ?kg=gehen steuern.
+      const url = new URL(location.href);
+      let kg = (url.searchParams.get("kg") || "").toLowerCase();
+      if (kg !== "kommen" && kg !== "gehen") {
+        // Fallback: Uhrzeit
+        kg = (new Date().getHours() < 12) ? "kommen" : "gehen";
+      }
+      return kg;
+    }
+
     // Submit -> send to Apps Script
     submitBtn.addEventListener("click", async () => {
-      const needsReason = (String(mood) === "1");
       if(!mood) return;
+
+      const afternoon = isAfternoon();
+      const needsReason = afternoon && (String(mood) === "1");
       if(needsReason && !reason) return;
 
       submitBtn.disabled = true;
       statusEl.textContent = "Sende…";
 
-  
-const url = new URL(location.href);
-const device = url.searchParams.get("device") || "ipad-unknown";
+      const url = new URL(location.href);
+      const device = url.searchParams.get("device") || "ipad-unknown";
+      const kg = computeKommenGehen();
 
-// Option A: Kommen/Gehen fix über URL steuern:
-// .../index.html?device=ipad1&kg=kommen
-// .../index.html?device=ipad1&kg=gehen
+      const now = new Date();
+      const fd = new FormData();
 
-let kg = (url.searchParams.get("kg") || "").toLowerCase();
+      fd.append("timestampClient", now.toISOString());
+      fd.append("deviceId", device);
+      fd.append("KommenGehen", kg);
+      fd.append("date", formatDateDMY(now));
 
-if (kg !== "kommen" && kg !== "gehen") {
-  // Option B (Fallback): per Uhrzeit entscheiden
-  kg = (new Date().getHours() < 12) ? "kommen" : "gehen";
-}
+      // Optional: damit du später auch "morning/afternoon" sauber auswerten kannst
+      fd.append("DayPart", afternoon ? "afternoon" : "morning");
 
-// Datum im Format dd/mm/yy
-function formatDateDMY(d){
-  const dd = String(d.getDate()).padStart(2, "0");
-  const mm = String(d.getMonth()+1).padStart(2, "0");
-  const yy = String(d.getFullYear()).slice(-2);
-  return `${dd}/${mm}/${yy}`;
-}
-
-const now = new Date();
-
-const fd = new FormData();
-
-fd.append("timestampClient", now.toISOString());
-fd.append("deviceId", device);
-fd.append("KommenGehen", kg);
-fd.append("date", formatDateDMY(now));
-
-fd.append("mood", String(mood));
-fd.append("reason", (String(mood) === "1") ? reason : "");
-
+      fd.append("mood", String(mood));
+      // Morgen: reason immer leer
+      // Nachmittag: nur bei Mood=1 reason senden
+      fd.append("reason", needsReason ? reason : "");
 
       try{
         await fetch(ENDPOINT, { method:"POST", mode:"no-cors", body: fd });
@@ -320,9 +345,38 @@ fd.append("reason", (String(mood) === "1") ? reason : "");
       }
     });
 
+    // Auto-Refresh um 12:00, damit die Frage garantiert wechselt
+    function scheduleNoonReload(){
+      const now = new Date();
+      const noon = new Date(now);
+      noon.setHours(12, 0, 0, 0);
+
+      // Wenn wir vor 12:00 sind, reload exakt um 12:00
+      if (now < noon){
+        const ms = noon.getTime() - now.getTime() + 500; // +0.5s Puffer
+        setTimeout(() => location.reload(), ms);
+      }
+    }
+
     // Init
+    setQuestionText();
+    scheduleNoonReload();
     updateUIForMood();
     updateSubmitState();
+
+    // Optional: falls Tablet sehr lange läuft und Uhrzeit sich ändert (z.B. über Mittag),
+    // prüfen wir alle 60s ob sich der "DayPart" geändert hat und resetten dann.
+    let lastAfternoon = isAfternoon();
+    setInterval(() => {
+      const nowAfternoon = isAfternoon();
+      if (nowAfternoon !== lastAfternoon){
+        lastAfternoon = nowAfternoon;
+        setQuestionText();
+        resetAllSelections();
+        updateUIForMood();
+        updateSubmitState();
+      }
+    }, 60000);
   </script>
 </body>
 </html>
