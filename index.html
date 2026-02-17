@@ -146,6 +146,45 @@
       .why-btn{ font-size: 30px; }
       .submit{ font-size: 34px; }
     }
+    
+    .compact h1{
+      margin-bottom: 12px;
+      font-size: clamp(34px, 5vw, 64px);
+    }
+
+    .compact .mood-grid{
+      margin-bottom: 18px;
+      gap: 18px;
+    }
+
+    .compact .tile{
+      height: 180px;
+    }
+
+    .compact .emoji{
+      font-size: 72px;
+    }
+
+    .compact h2{
+      font-size: 32px;
+      margin: 10px 0 8px;
+    }
+
+    .compact .why-row{
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .compact .why-btn{
+      font-size: 26px;
+      padding: 12px 14px;
+    }
+    
+    .compact .submit{
+      font-size: 30px;
+      padding: 14px 16px;
+    }
+    
   </style>
 </head>
 
@@ -216,13 +255,17 @@
     // Warum nur wenn: Nachmittag UND Mood=1
     function updateUIForMood(){
       const needsWhy = isAfternoon() && (String(mood) === "1");
+    
       if(needsWhy){
         whySection.classList.remove("hidden");
+        document.body.classList.add("compact");
       } else {
         whySection.classList.add("hidden");
         resetReason();
+        document.body.classList.remove("compact");
       }
     }
+
 
     // Submit-Regeln:
     // - Morgen: nur Mood nötig
@@ -370,4 +413,5 @@
   </script>
 </body>
 </html>
+
 
