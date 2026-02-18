@@ -6,116 +6,250 @@
   <title>MoodSurveyResponse</title>
   <style>
     :root{
-      --brand:#3a64b8;
-      --tile:#466fbe;
-      --tileActive:#0b1a7a;
+      /* Base */
       --bg:#f4f6fb;
       --text:#0f172a;
-      --border:#c7c7c7;
-      --btnDisabled:#d6d6d6;
+      --muted:#64748b;
+
+      /* Brand */
+      --brand:#3a64b8;
+
+      /* Surfaces */
+      --surface: rgba(255,255,255,.72);
+      --surfaceBorder: rgba(15,23,42,.10);
+
+      /* Mood colors (subtle) */
+      --m1:#e11d48;  /* rose */
+      --m2:#94a3b8;  /* slate */
+      --m3:#16a34a;  /* green */
+      --m4:#22c55e;  /* bright green */
+
+      /* Effects */
+      --shadow: 0 10px 26px rgba(2,6,23,.10);
+      --shadow2: 0 14px 34px rgba(2,6,23,.14);
+      --radius: 18px;
     }
 
     *{ box-sizing:border-box; }
     body{
       margin:0;
       font-family: -apple-system, system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--bg);
       color: var(--text);
+      background:
+        radial-gradient(1100px 520px at 50% -120px, var(--timeGlow, rgba(58,100,184,.10)), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 40%),
+        var(--bg);
     }
 
     .wrap{
-      max-width: 1200px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 28px 24px 40px;
+      padding: 26px 22px 36px;
       text-align:center;
     }
 
-    h1{
-      margin: 10px 0 26px;
-      font-size: clamp(40px, 6vw, 86px);
+    /* Debug-Bar Styles */
+    #debugBar .dbg{
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(15,23,42,.14);
+      background: rgba(255,255,255,.8);
       font-weight: 800;
-      color:#000;
+      color:#0f172a;
+      cursor:pointer;
+      box-shadow: 0 6px 14px rgba(2,6,23,.08);
+    }
+    #debugBar .dbg.active{
+      border-color: rgba(58,100,184,.55);
+      background: rgba(58,100,184,.12);
+    }
+
+    h1{
+      margin: 10px 0 18px;
+      font-size: clamp(40px, 6vw, 82px);
+      font-weight: 850;
+      letter-spacing: -0.02em;
+      color:#0b1220;
+    }
+
+    .subtle-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.75);
+      border: 1px solid rgba(15,23,42,.10);
+      box-shadow: 0 6px 16px rgba(2,6,23,.06);
+      color: #334155;
+      font-weight: 650;
+      font-size: 16px;
+      margin-bottom: 18px;
+      user-select:none;
+    }
+    .dot{
+      width:10px; height:10px;
+      border-radius:999px;
+      background: var(--timeDot, rgba(58,100,184,.75));
+      box-shadow: 0 0 0 3px rgba(58,100,184,.12);
+    }
+
+    .panel{
+      background: var(--surface);
+      border: 1px solid var(--surfaceBorder);
+      border-radius: calc(var(--radius) + 8px);
+      padding: 22px 18px 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
 
     .mood-grid{
       display:grid;
       grid-template-columns: repeat(4, minmax(140px, 1fr));
-      gap: 26px;
+      gap: 22px;
       max-width: 980px;
-      margin: 0 auto 34px;
+      margin: 0 auto 22px;
     }
 
     .tile{
-      background: var(--tile);
-      border-radius: 12px;
-      height: 220px;
+      position:relative;
+      border-radius: var(--radius);
+      height: 210px;
       display:flex;
       align-items:center;
       justify-content:center;
-      border: 4px solid rgba(0,0,0,.08);
-      box-shadow: 0 6px 16px rgba(0,0,0,.08);
+
+      background: rgba(255,255,255,.82);
+      border: 1px solid rgba(15,23,42,.12);
+      box-shadow: 0 8px 22px rgba(2,6,23,.08);
+
       cursor:pointer;
       user-select:none;
-      transition: transform .08s ease, filter .08s ease, background .08s ease;
+
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
     }
-    .tile:active{ transform: scale(.99); }
+
+    .tile:hover{
+      transform: translateY(-2px);
+      box-shadow: var(--shadow2);
+      border-color: rgba(58,100,184,.35);
+    }
+    .tile:focus-visible{
+      outline: 4px solid rgba(58,100,184,.35);
+      outline-offset: 4px;
+    }
+    .tile:active{ transform: translateY(-1px) scale(.99); }
+
+    .tile::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius: var(--radius);
+      pointer-events:none;
+      opacity:.18;
+      background: linear-gradient(180deg, var(--moodColor, rgba(58,100,184,.35)), transparent 65%);
+    }
 
     .tile.active{
-      background: var(--tileActive);
-      filter: saturate(1.05);
+      border-color: var(--moodColor, rgba(58,100,184,.70));
+      box-shadow: 0 16px 40px rgba(2,6,23,.16);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.78)),
+        rgba(255,255,255,.85);
+    }
+    .tile.active::after{
+      content:"✓";
+      position:absolute;
+      top: 14px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight: 900;
+      color: #fff;
+      background: var(--moodColor, var(--brand));
+      box-shadow: 0 8px 18px rgba(2,6,23,.20);
+      font-size: 18px;
     }
 
     .emoji{
-      font-size: 92px;
+      font-size: 94px;
       line-height: 1;
       transform: translateY(2px);
+      filter: drop-shadow(0 8px 12px rgba(2,6,23,.18));
+    }
+
+    .label{
+      position:absolute;
+      bottom: 14px;
+      left: 0;
+      right: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #475569;
+      opacity: .9;
+      letter-spacing: .01em;
     }
 
     h2{
-      margin: 22px 0 14px;
-      font-size: 44px;
-      font-weight: 800;
-      color:#000;
+      margin: 18px 0 12px;
+      font-size: 36px;
+      font-weight: 850;
+      letter-spacing: -0.02em;
+      color:#0b1220;
     }
 
     .why-row{
       display:flex;
       justify-content:center;
-      gap: 28px;
+      gap: 16px;
       flex-wrap:wrap;
-      margin: 10px 0 26px;
+      margin: 8px 0 18px;
     }
 
     .why-btn{
-      width: 300px;
+      width: 280px;
       max-width: 90vw;
-      height: 72px;                 
-      padding: 0 16px;              
-      font-size: 28px;
-      font-weight: 700;
-      border-radius: 10px;
-      border: 3px solid var(--border);
-      background: var(--btnDisabled);
-      color:#fff;
+      height: 66px;
+      padding: 0 16px;
+      font-size: 26px;
+      font-weight: 800;
+      border-radius: 14px;
+
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.85);
+      color: #0f172a;
+
       cursor:pointer;
       user-select:none;
-      box-shadow: 0 4px 10px rgba(0,0,0,.06);
-    
-      display: flex;                
+
+      box-shadow: 0 8px 18px rgba(2,6,23,.08);
+      display: flex;
       align-items: center;
       justify-content: center;
-    
-      white-space: nowrap;          
+      white-space: nowrap;
+
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
     }
 
+    .why-btn:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(2,6,23,.12);
+      border-color: rgba(58,100,184,.30);
+    }
 
     .why-btn.active{
-      background: #6b86c6;
-      border-color: #6b86c6;
+      background: rgba(58,100,184,.12);
+      border-color: rgba(58,100,184,.55);
+      box-shadow: 0 16px 40px rgba(2,6,23,.14);
     }
 
     .submit-wrap{
-      margin-top: 10px;
+      margin-top: 8px;
       display:flex;
       justify-content:center;
     }
@@ -123,25 +257,35 @@
     .submit{
       width: 360px;
       max-width: 90vw;
-      padding: 18px 20px;
-      font-size: 40px;
-      font-weight: 800;
-      border-radius: 12px;
-      border: 3px solid #b6b6b6;
-      background: #e5e5e5;
-      color: #a8a8a8;
+      padding: 16px 18px;
+      font-size: 38px;
+      font-weight: 900;
+      border-radius: 16px;
+
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(15,23,42,.06);
+      color: rgba(15,23,42,.35);
       cursor:not-allowed;
+
+      box-shadow: 0 10px 26px rgba(2,6,23,.10);
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
     }
     .submit.enabled{
-      background: #ffffff;
-      color:#111;
+      background: linear-gradient(180deg, rgba(58,100,184,.98), rgba(44,82,166,.98));
+      color:#fff;
+      border-color: rgba(58,100,184,.55);
       cursor:pointer;
     }
+    .submit.enabled:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(2,6,23,.18);
+    }
+    .submit.enabled:active{ transform: translateY(0px) scale(.99); }
 
     .status{
-      margin-top: 14px;
+      margin-top: 12px;
       font-size: 16px;
-      color: #334155;
+      color: var(--muted);
       min-height: 22px;
     }
 
@@ -149,82 +293,92 @@
 
     @media (max-width: 900px){
       .mood-grid{ grid-template-columns: repeat(2, minmax(140px, 1fr)); }
-      .tile{ height: 200px; }
-      .emoji{ font-size: 84px; }
-      .why-btn{ font-size: 30px; }
+      .tile{ height: 195px; }
+      .emoji{ font-size: 86px; }
+      .why-btn{ font-size: 28px; }
       .submit{ font-size: 34px; }
     }
-    
+
+    /* Wenn Warum sichtbar ist: kompakter */
     .compact h1{
-      margin-bottom: 12px;
-      font-size: clamp(34px, 5vw, 64px);
+      margin-bottom: 10px;
+      font-size: clamp(34px, 5vw, 62px);
     }
-
+    .compact .subtle-badge{ margin-bottom: 12px; }
     .compact .mood-grid{
-      margin-bottom: 18px;
-      gap: 18px;
+      margin-bottom: 14px;
+      gap: 16px;
     }
-
-    .compact .tile{
-      height: 180px;
-    }
-
-    .compact .emoji{
-      font-size: 72px;
-    }
-
+    .compact .tile{ height: 175px; }
+    .compact .emoji{ font-size: 74px; }
     .compact h2{
-      font-size: 32px;
+      font-size: 30px;
       margin: 10px 0 8px;
     }
+    .compact .why-row{ gap: 12px; margin-bottom: 14px; }
+    .compact .why-btn{ font-size: 24px; height: 58px; }
+    .compact .submit{ font-size: 30px; padding: 14px 16px; }
 
-    .compact .why-row{
-      gap: 16px;
-      margin-bottom: 16px;
+    @media (prefers-reduced-motion: reduce){
+      .tile, .why-btn, .submit{ transition:none; }
+      .tile:hover, .why-btn:hover, .submit.enabled:hover{ transform:none; }
     }
-    
-    .compact .why-btn{
-      font-size: 24px;
-      height: 60px;
-      padding: 12px 14px;
-    }
-    
-    .compact .submit{
-      font-size: 30px;
-      padding: 14px 16px;
-    }
-    
   </style>
 </head>
 
 <body>
-
   <div class="wrap">
     <h1 id="questionTitle">Wie war dein Tag?</h1>
 
-    <div class="mood-grid" id="moodGrid">
-      <div class="tile" data-mood="1" aria-label="Sehr schlecht" role="button" tabindex="0"><div class="emoji">😞</div></div>
-      <div class="tile" data-mood="2" aria-label="Neutral" role="button" tabindex="0"><div class="emoji">😐</div></div>
-      <div class="tile" data-mood="3" aria-label="Gut" role="button" tabindex="0"><div class="emoji">🙂</div></div>
-      <div class="tile" data-mood="4" aria-label="Sehr gut" role="button" tabindex="0"><div class="emoji">😁</div></div>
+    <div class="subtle-badge" id="timeBadge" aria-hidden="true">
+      <span class="dot"></span>
+      <span id="timeBadgeText">Check-in</span>
     </div>
 
-    <!-- Wird nur am Nachmittag UND nur bei Mood=1 gezeigt -->
-    <div id="whySection" class="hidden">
-      <h2>Warum?</h2>
+    <!-- Debug-Switch (nur wenn ?debug=1) -->
+    <div id="debugBar" class="hidden" style="margin:10px auto 16px; display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap;">
+      <span style="font-weight:700; color:#475569;">Test:</span>
+      <button type="button" class="dbg" data-mode="auto">Auto</button>
+      <button type="button" class="dbg" data-mode="morning">Morgen</button>
+      <button type="button" class="dbg" data-mode="afternoon">Nachmittag</button>
+    </div>
 
-      <div class="why-row" id="whyRow">
-        <button class="why-btn" type="button" data-reason="Privat">Privat</button>
-        <button class="why-btn" type="button" data-reason="Geschäftlich">Geschäftlich</button>
-        <button class="why-btn" type="button" data-reason="Sonstiges">Sonstiges</button>
+    <div class="panel">
+      <div class="mood-grid" id="moodGrid">
+        <div class="tile" data-mood="1" aria-label="Sehr schlecht" role="button" tabindex="0" style="--moodColor: var(--m1);">
+          <div class="emoji">😞</div>
+          <div class="label">schlecht</div>
+        </div>
+        <div class="tile" data-mood="2" aria-label="Neutral" role="button" tabindex="0" style="--moodColor: var(--m2);">
+          <div class="emoji">😐</div>
+          <div class="label">ok</div>
+        </div>
+        <div class="tile" data-mood="3" aria-label="Gut" role="button" tabindex="0" style="--moodColor: var(--m3);">
+          <div class="emoji">🙂</div>
+          <div class="label">gut</div>
+        </div>
+        <div class="tile" data-mood="4" aria-label="Sehr gut" role="button" tabindex="0" style="--moodColor: var(--m4);">
+          <div class="emoji">😁</div>
+          <div class="label">sehr gut</div>
+        </div>
       </div>
-    </div>
 
-    <div class="submit-wrap">
-      <button class="submit" id="submitBtn" type="button" disabled>Absenden</button>
-    </div>
+      <!-- NEU: Wird IMMER gezeigt, sobald Mood=1 gewählt ist (egal Morgen/Nachmittag) -->
+      <div id="whySection" class="hidden">
+        <h2>Warum?</h2>
+        <div class="why-row" id="whyRow">
+          <button class="why-btn" type="button" data-reason="Privat">Privat</button>
+          <button class="why-btn" type="button" data-reason="Geschäftlich">Geschäftlich</button>
+          <button class="why-btn" type="button" data-reason="Sonstiges">Sonstiges</button>
+        </div>
+      </div>
 
-    <div class="status" id="status"></div>
+      <div class="submit-wrap">
+        <button class="submit" id="submitBtn" type="button" disabled>Absenden</button>
+      </div>
+
+      <div class="status" id="status"></div>
+    </div>
   </div>
 
   <script>
@@ -240,11 +394,70 @@
     const submitBtn = document.getElementById("submitBtn");
     const statusEl = document.getElementById("status");
 
+    const timeBadgeText = document.getElementById("timeBadgeText");
+
+    // --- Debug DayPart Override ---------------------------------
+    const debugBar = document.getElementById("debugBar");
+    let dayPartOverride = null; // "morning" | "afternoon" | null
+
+    function getDayPartOverride(){
+      if(dayPartOverride) return dayPartOverride;
+
+      const u = new URL(location.href);
+      const dp = (u.searchParams.get("daypart") || "").toLowerCase();
+      if(dp === "morning" || dp === "afternoon") return dp;
+
+      return null;
+    }
+
     function isAfternoon(d = new Date()){
+      const ov = getDayPartOverride();
+      if(ov === "morning") return false;
+      if(ov === "afternoon") return true;
       return d.getHours() >= 12;
     }
 
+    function initDebugBar(){
+      const u = new URL(location.href);
+      const debug = u.searchParams.get("debug") === "1";
+      if(!debug) return;
+
+      debugBar.classList.remove("hidden");
+
+      const buttons = [...debugBar.querySelectorAll(".dbg")];
+      const setActive = (mode) => buttons.forEach(b => b.classList.toggle("active", b.dataset.mode === mode));
+
+      const initial = getDayPartOverride() || "auto";
+      setActive(initial);
+
+      debugBar.addEventListener("click", (e) => {
+        const btn = e.target.closest(".dbg");
+        if(!btn) return;
+
+        const mode = btn.dataset.mode;
+        dayPartOverride = (mode === "auto") ? null : mode;
+
+        setActive(mode);
+
+        // UI refresh ohne reload
+        applyDayPartTheme();
+        setQuestionText();
+        resetAllSelections();
+        updateUIForMood();
+        updateSubmitState();
+      });
+    }
+    // -------------------------------------------------------------
+
+    function applyDayPartTheme(){
+      const afternoon = isAfternoon();
+      document.body.style.setProperty("--timeGlow", afternoon ? "rgba(245,158,11,.12)" : "rgba(56,189,248,.12)");
+      document.body.style.setProperty("--timeDot",  afternoon ? "rgba(245,158,11,.85)" : "rgba(56,189,248,.85)");
+      timeBadgeText.textContent = afternoon ? "Nachmittag • Tagesrückblick" : "Morgen • kurzer Check-in";
+    }
+
     function setQuestionText(){
+      // Frage kann ruhig weiterhin je nach Tageszeit wechseln
       questionTitle.textContent = isAfternoon() ? "Wie war dein Tag?" : "Wie geht es dir?";
     }
 
@@ -261,10 +474,10 @@
       [...whyRow.querySelectorAll(".why-btn")].forEach(b => b.classList.remove("active"));
     }
 
-    // Warum nur wenn: Nachmittag UND Mood=1
+    // NEU: Warum immer bei Mood=1 (egal Morgen/Nachmittag)
     function updateUIForMood(){
-      const needsWhy = isAfternoon() && (String(mood) === "1");
-    
+      const needsWhy = (String(mood) === "1");
+
       if(needsWhy){
         whySection.classList.remove("hidden");
         document.body.classList.add("compact");
@@ -275,13 +488,11 @@
       }
     }
 
-
-    // Submit-Regeln:
-    // - Morgen: nur Mood nötig
-    // - Nachmittag: Mood nötig; wenn Mood=1 zusätzlich Reason nötig
+    // NEU: Submit-Regeln:
+    // - Mood immer nötig
+    // - Wenn Mood=1 -> Reason immer nötig (egal Morgen/Nachmittag)
     function updateSubmitState(){
-      const afternoon = isAfternoon();
-      const needsReason = afternoon && (String(mood) === "1");
+      const needsReason = (String(mood) === "1");
       const ok = !!mood && (needsReason ? !!reason : true);
 
       submitBtn.disabled = !ok;
@@ -306,7 +517,6 @@
       updateSubmitState();
     }
 
-    // Mood click + keyboard
     moodGrid.addEventListener("click", (e) => {
       const tile = e.target.closest(".tile");
       if(!tile) return;
@@ -320,7 +530,6 @@
       selectMood(tile.dataset.mood);
     });
 
-    // Why buttons
     whyRow.addEventListener("click", (e) => {
       const btn = e.target.closest(".why-btn");
       if(!btn) return;
@@ -334,12 +543,10 @@
       return `${dd}/${mm}/${yy}`;
     }
 
-    // Submit -> send to Apps Script
     submitBtn.addEventListener("click", async () => {
       if(!mood) return;
 
-      const afternoon = isAfternoon();
-      const needsReason = afternoon && (String(mood) === "1");
+      const needsReason = (String(mood) === "1");
       if(needsReason && !reason) return;
 
       submitBtn.disabled = true;
@@ -355,12 +562,10 @@
       fd.append("deviceId", device);
       fd.append("date", formatDateDMY(now));
 
-      // Optional: damit du später auch "morning/afternoon" sauber auswerten kannst
-      fd.append("DayPart", afternoon ? "afternoon" : "morning");
+      // DayPart schicken wir weiterhin (für Auswertung), auch wenn "Warum" nicht mehr davon abhängt
+      fd.append("DayPart", isAfternoon() ? "afternoon" : "morning");
 
       fd.append("mood", String(mood));
-      // Morgen: reason immer leer
-      // Nachmittag: nur bei Mood=1 reason senden
       fd.append("reason", needsReason ? reason : "");
 
       try{
@@ -374,33 +579,34 @@
       }
     });
 
-    // Auto-Refresh um 12:00, damit die Frage garantiert wechselt
     function scheduleNoonReload(){
       const now = new Date();
       const noon = new Date(now);
       noon.setHours(12, 0, 0, 0);
 
-      // Wenn wir vor 12:00 sind, reload exakt um 12:00
       if (now < noon){
-        const ms = noon.getTime() - now.getTime() + 500; // +0.5s Puffer
+        const ms = noon.getTime() - now.getTime() + 500;
         setTimeout(() => location.reload(), ms);
       }
     }
 
     // Init
+    applyDayPartTheme();
     setQuestionText();
+    initDebugBar();
     scheduleNoonReload();
     updateUIForMood();
     updateSubmitState();
 
-    // Optional: falls Tablet sehr lange läuft und Uhrzeit sich ändert (z.B. über Mittag),
-    // prüfen wir alle 60s ob sich der "DayPart" geändert hat und resetten dann.
+    // DayPart-Wechsel im laufenden Betrieb (für Badge/Hintergrund + Frage)
     let lastAfternoon = isAfternoon();
     setInterval(() => {
       const nowAfternoon = isAfternoon();
       if (nowAfternoon !== lastAfternoon){
         lastAfternoon = nowAfternoon;
+        applyDayPartTheme();
         setQuestionText();
+        // Optional: ich lasse das Reset drin, damit’s klar bleibt bei Wechsel über Mittag
         resetAllSelections();
         updateUIForMood();
         updateSubmitState();
@@ -409,7 +615,3 @@
   </script>
 </body>
 </html>
-
-
-
-
