@@ -288,48 +288,62 @@
 
     .why-row{
       display:flex;
-      justify-content:center;
-      gap: 16px;
-      flex-wrap:wrap;
-      margin: 8px 0 18px;
+      flex-direction: column;     /* ✅ untereinander */
+      align-items: center;
+      gap: 10px;
+      margin: 6px 0 14px;
     }
-
+    
     .why-btn{
-      width: 280px;
-      max-width: 90vw;
-      height: 66px;
-      padding: 0 16px;
-      font-size: 26px;
+      width: min(860px, 92vw);    /* ✅ schön breit, aber passt aufs iPad */
+      min-height: 56px;
+      padding: 12px 14px;
+      font-size: 18px;
       font-weight: 800;
+      line-height: 1.15;
+    
       border-radius: 14px;
-
       border: 1px solid rgba(15,23,42,.12);
       background: rgba(255,255,255,.85);
       color: #0f172a;
-
+    
       cursor:pointer;
       user-select:none;
-
+    
       box-shadow: 0 8px 18px rgba(2,6,23,.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      white-space: nowrap;
-
+      display:flex;
+      align-items:center;
+      justify-content:flex-start; /* ✅ Text links = besser lesbar */
+      text-align:left;
+      white-space: normal;        /* ✅ darf umbrechen */
+      word-break: break-word;
+    
       transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
     }
-
+    
+    .why-btn::before{
+      content:"";
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      margin-right: 12px;
+      flex: 0 0 10px;
+      background: color-mix(in srgb, var(--accent) 55%, white 45%);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+    }
+    
     .why-btn:hover{
-      transform: translateY(-2px);
+      transform: translateY(-1px);
       box-shadow: 0 14px 30px rgba(2,6,23,.12);
       border-color: color-mix(in srgb, var(--accent) 30%, rgba(15,23,42,.12));
     }
-
+    
     .why-btn.active{
       background: color-mix(in srgb, var(--accent) 12%, white 88%);
       border-color: color-mix(in srgb, var(--accent) 55%, transparent);
       box-shadow: 0 16px 40px rgba(2,6,23,.14);
     }
+
 
     .submit-wrap{
       margin-top: 8px;
@@ -382,24 +396,65 @@
       .submit{ font-size: 34px; }
     }
 
-    /* Wenn Warum sichtbar ist: kompakter */
+    /* ✅ Aggressiver Compact: iPad ohne Scroll */
+    .compact .panel{
+      padding: 14px 14px 16px;
+    }
+    
+    .compact .header-stack{
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
     .compact h1{
-      font-size: clamp(34px, 5vw, 62px);
-      padding: 8px 14px;
+      padding: 6px 12px;
+      font-size: clamp(30px, 4.6vw, 54px);
     }
+    
+    .compact .subtle-badge{
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    
     .compact .mood-grid{
-      margin-bottom: 14px;
-      gap: 16px;
+      gap: 12px;
+      margin-bottom: 10px;
     }
-    .compact .tile{ height: 175px; }
-    .compact .emoji{ font-size: 74px; }
+    
+    .compact .tile{
+      height: 145px;
+    }
+    
+    .compact .emoji{
+      font-size: 62px;
+    }
+    
+    .compact .label{
+      font-size: 14px;
+      bottom: 10px;
+    }
+    
     .compact h2{
-      font-size: 30px;
-      margin: 10px 0 8px;
+      font-size: 22px;
+      margin: 6px 0 8px;
     }
-    .compact .why-row{ gap: 12px; margin-bottom: 14px; }
-    .compact .why-btn{ font-size: 24px; height: 58px; }
-    .compact .submit{ font-size: 30px; padding: 14px 16px; }
+    
+    .compact .why-row{
+      gap: 8px;
+      margin: 0 0 10px;
+    }
+    
+    .compact .why-btn{
+      min-height: 48px;
+      padding: 10px 12px;
+      font-size: 16px;
+    }
+    
+    .compact .submit{
+      font-size: 28px;
+      padding: 12px 14px;
+    }
+
 
     @media (prefers-reduced-motion: reduce){
       body{ transition:none; }
@@ -467,14 +522,11 @@
         </div>
       </div>
 
-      <div id="whySection" class="hidden">
-        <h2>Warum?</h2>
-        <div class="why-row" id="whyRow">
-          <button class="why-btn" type="button" data-reason="Privat">Privat</button>
-          <button class="why-btn" type="button" data-reason="Geschäftlich">Geschäftlich</button>
-          <button class="why-btn" type="button" data-reason="Sonstiges">Sonstiges</button>
-        </div>
-      </div>
+    <div id="whySection" class="hidden">
+      <h2 id="whyTitle">Warum?</h2>
+      <div class="why-row" id="whyRow"></div>
+    </div>
+
 
       <div class="submit-wrap">
         <button class="submit" id="submitBtn" type="button" disabled>Absenden</button>
@@ -613,18 +665,66 @@
       reason = null;
       statusEl.textContent = "";
       [...moodGrid.querySelectorAll(".tile")].forEach(t => t.classList.remove("active"));
+      // why buttons evtl. noch nicht gerendert -> safe:
       [...whyRow.querySelectorAll(".why-btn")].forEach(b => b.classList.remove("active"));
     }
-
+    
     function resetReason(){
       reason = null;
       [...whyRow.querySelectorAll(".why-btn")].forEach(b => b.classList.remove("active"));
     }
 
+
+    const whyTitle = document.getElementById("whyTitle");
+
+    // ✅ Neue Listen
+    const WHY_MORNING = [
+      "Ich bin heute müde/ nicht fit",
+      "Ich habe nicht gut geschlafen",
+      "Ich fühle mich gestresst oder unter Druck",
+      "Ich bin gedanklich stark beschäftigt (privat oder beruflich)",
+      "Mir fehlt heute Motivation",
+      "Sonstiges/ möchte ich nicht angeben"
+    ];
+    
+    const WHY_AFTERNOON = [
+      "Zu viel Arbeitsbelastung",
+      "Unklare Prioritäten oder fehlende Informationen",
+      "Konflikte / schwierige Zusammenarbeit",
+      "Ich kam heute nicht vorwärts",
+      "Es lag nicht an der Arbeit (persönlicher Grund)",
+      "Sonstiges"
+    ];
+    
+    function renderWhyOptions(){
+      const afternoon = isAfternoon();
+      const options = afternoon ? WHY_AFTERNOON : WHY_MORNING;
+    
+      // Optional: Titel leicht anders
+      // whyTitle.textContent = afternoon ? "Was war der Hauptgrund?" : "Woran liegt’s?";
+      whyTitle.textContent = "Warum?";
+    
+      // Buttons neu bauen
+      whyRow.innerHTML = options.map(txt => {
+        // data-reason exakt der Text (damit du ihn 1:1 speichern kannst)
+        const safe = txt.replaceAll('"','&quot;');
+        return `<button class="why-btn" type="button" data-reason="${safe}">${txt}</button>`;
+      }).join("");
+    
+      // Wenn vorher schon ein reason selektiert war, wieder markieren (z.B. debug switch)
+      if(reason){
+        [...whyRow.querySelectorAll(".why-btn")].forEach(b => {
+          b.classList.toggle("active", b.dataset.reason === reason);
+        });
+      }
+    }
+
+
     function updateUIForMood(){
       const needsWhy = (String(mood) === "1");
-
+    
       if(needsWhy){
+        renderWhyOptions();                 // ✅ NEU
         whySection.classList.remove("hidden");
         document.body.classList.add("compact");
       } else {
@@ -633,6 +733,7 @@
         document.body.classList.remove("compact");
       }
     }
+
 
     function updateSubmitState(){
       const needsReason = (String(mood) === "1");
@@ -753,3 +854,4 @@
   </script>
 </body>
 </html>
+
