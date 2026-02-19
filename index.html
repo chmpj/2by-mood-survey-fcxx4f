@@ -327,19 +327,23 @@
       position: fixed;
       top: 16px;
       right: 16px;
-      height: 48px;          /* 👈 perfekte iPad-Größe */
+      height: 32px;          /* 👈 perfekte iPad-Größe */
       max-width: 40vw;
       object-fit: contain;
-      opacity: 0.9;          /* leicht dezent */
+      opacity: 0.75;          /* leicht dezent */
       z-index: 1000;         /* immer über allem */
       pointer-events: none; /* kann nicht angeklickt werden */
+    }
+    .compact .corner-logo{
+      height: 26px;
+      opacity: 0.65;
     }
 
   </style>
 </head>
 
 <body>
-  <img src="Logo.png" alt="Logo" class="corner-logo">
+  <img src="Logo.svg" alt="Logo" class="corner-logo">
   <div class="wrap">
     <h1 id="questionTitle">Wie war dein Tag?</h1>
 
@@ -628,4 +632,5 @@
   </script>
 </body>
 </html>
+
 
