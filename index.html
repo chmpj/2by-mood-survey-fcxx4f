@@ -375,47 +375,40 @@
       pointer-events: none;
     }
 
-    /* ========== AFTERNOON MODE (ernster) ========== */
-body.afternoon {
-      background:
-        radial-gradient(900px 420px at 50% -160px, rgba(2,6,23,.35), transparent 60%),
-        linear-gradient(180deg, rgba(241,245,249,.85), rgba(241,245,249,.65)),
-        var(--bg);
+    :root{
+      /* Glow Farben (werden per JS gesetzt) */
+      --qGlow1: rgba(56,189,248,.55);   /* blau */
+      --qGlow2: rgba(56,189,248,.30);
     }
     
-    /* Panel schwerer */
-    body.afternoon .panel{
-      background: rgba(255,255,255,.92);
-      border-color: rgba(15,23,42,.18);
-      box-shadow: 0 18px 46px rgba(2,6,23,.22);
+    /* Glow-Effekt für die Frage */
+    #questionTitle{
+      position: relative;
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 18px;
     }
     
-    /* Titel etwas kompakter */
-    body.afternoon h1{
-      letter-spacing: -0.03em;
+    /* Glow hinter dem Text (kräftig, aber sauber) */
+    #questionTitle::before{
+      content:"";
+      position:absolute;
+      inset: -18px -26px;
+      border-radius: 26px;
+      background: radial-gradient(circle at 50% 55%, var(--qGlow1), transparent 60%);
+      filter: blur(10px);
+      opacity: 1;
+      z-index: -1;
+      pointer-events: none;
     }
     
-    /* Emojis minimal weniger verspielt */
-    body.afternoon .emoji{
-      filter: saturate(.85) drop-shadow(0 6px 10px rgba(2,6,23,.22));
-    }
-    
-    /* Mood Tiles ruhiger */
-    body.afternoon .tile{
-      background: rgba(248,250,252,.95);
-    }
-    
-    /* Absenden-Button ernster */
-    body.afternoon .submit.enabled{
-      background: linear-gradient(
-        180deg,
-        rgba(15,23,42,.95),
-        rgba(30,41,59,.95)
-      );
-      border-color: rgba(15,23,42,.55);
+    /* Zusätzlich Text-Glow (macht’s wirklich “pop”) */
+    #questionTitle{
+      text-shadow:
+        0 0 22px var(--qGlow1),
+        0 0 48px var(--qGlow2);
     }
 
-    
   </style>
 </head>
 
@@ -561,30 +554,39 @@ body.afternoon {
         document.body.style.setProperty("--timeDot", "rgba(56,189,248,.86)");
       }
     }
-
     function applyDayPartTheme(){
       const afternoon = isAfternoon();
     
-      // Klasse für „ernsten“ Modus
-      document.body.classList.toggle("afternoon", afternoon);
-    
-      // Farb-Akzente (bleiben wie gehabt)
       if(afternoon){
-        document.body.style.setProperty("--accent",  "rgba(15,23,42,.95)");
-        document.body.style.setProperty("--accent2", "rgba(30,41,59,.95)");
-        document.body.style.setProperty("--timeGlow","rgba(2,6,23,.22)");
-        document.body.style.setProperty("--timeDot", "rgba(15,23,42,.85)");
+        // Nachmittag (orange)
+        document.body.style.setProperty("--accent",  "rgba(245,158,11,.98)");
+        document.body.style.setProperty("--accent2", "rgba(234,88,12,.98)");
+        document.body.style.setProperty("--timeGlow","rgba(245,158,11,.14)");
+        document.body.style.setProperty("--timeDot", "rgba(245,158,11,.85)");
+    
+        // 🔥 NEU: kräftiger Glow für die Frage
+        document.body.style.setProperty("--qGlow1", "rgba(245,158,11,.70)");
+        document.body.style.setProperty("--qGlow2", "rgba(245,158,11,.40)");
+    
         timeBadgeIcon.textContent = "🌙";
         timeBadgeText.textContent = "Nachmittag • Tagesrückblick";
+    
       } else {
+        // Morgen (blau)
         document.body.style.setProperty("--accent",  "rgba(56,189,248,.98)");
         document.body.style.setProperty("--accent2", "rgba(14,165,233,.98)");
-        document.body.style.setProperty("--timeGlow","rgba(56,189,248,.12)");
+        document.body.style.setProperty("--timeGlow","rgba(56,189,248,.14)");
         document.body.style.setProperty("--timeDot", "rgba(56,189,248,.86)");
+    
+        // 🔥 NEU: kräftiger Glow für die Frage
+        document.body.style.setProperty("--qGlow1", "rgba(56,189,248,.70)");
+        document.body.style.setProperty("--qGlow2", "rgba(56,189,248,.40)");
+    
         timeBadgeIcon.textContent = "☀️";
         timeBadgeText.textContent = "Morgen • kurzer Check-in";
       }
     }
+
 
 
     function setQuestionText(){
@@ -751,4 +753,5 @@ body.afternoon {
   </script>
 </body>
 </html>
+
 
