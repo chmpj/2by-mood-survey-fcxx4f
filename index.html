@@ -397,63 +397,90 @@
     }
 
     /* ✅ Aggressiver Compact: iPad ohne Scroll */
-    .compact .panel{
-      padding: 14px 14px 16px;
-    }
+    /* ✅ iPad Querformat: Compact noch kompakter + Warum in 2 Spalten */
+    @media (orientation: landscape) and (max-height: 820px){
     
-    .compact .header-stack{
-      gap: 8px;
-      margin-bottom: 12px;
-    }
+      .compact .wrap{
+        padding: 16px 16px 18px;
+      }
     
-    .compact h1{
-      padding: 6px 12px;
-      font-size: clamp(30px, 4.6vw, 54px);
-    }
+      .compact .panel{
+        padding: 12px 12px 12px;
+      }
     
-    .compact .subtle-badge{
-      padding: 8px 12px;
-      font-size: 14px;
-    }
+      .compact .header-stack{
+        gap: 6px;
+        margin-bottom: 10px;
+      }
     
-    .compact .mood-grid{
-      gap: 12px;
-      margin-bottom: 10px;
-    }
+      .compact h1{
+        padding: 6px 10px;
+        font-size: clamp(28px, 4.0vw, 46px);
+      }
     
-    .compact .tile{
-      height: 145px;
-    }
+      .compact .subtle-badge{
+        padding: 7px 10px;
+        font-size: 13px;
+      }
     
-    .compact .emoji{
-      font-size: 62px;
-    }
+      /* Mood-Kacheln kleiner */
+      .compact .mood-grid{
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .compact .tile{
+        height: 120px;
+      }
+      .compact .emoji{
+        font-size: 54px;
+      }
+      .compact .label{
+        font-size: 13px;
+        bottom: 8px;
+      }
     
-    .compact .label{
-      font-size: 14px;
-      bottom: 10px;
-    }
+      /* Warum-Titel kleiner */
+      .compact h2{
+        font-size: 18px;
+        margin: 4px 0 6px;
+      }
     
-    .compact h2{
-      font-size: 22px;
-      margin: 6px 0 8px;
-    }
+      /* ✅ KEY FIX: Warum-Antworten als Grid (2 Spalten) */
+      .compact .why-row{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin: 0 0 10px;
+        align-items: stretch;
+      }
     
-    .compact .why-row{
-      gap: 8px;
-      margin: 0 0 10px;
-    }
+      .compact .why-btn{
+        width: 100%;
+        min-height: 44px;
+        padding: 9px 10px;
+        font-size: 15px;
+        line-height: 1.12;
+      }
     
-    .compact .why-btn{
-      min-height: 48px;
-      padding: 10px 12px;
-      font-size: 16px;
-    }
+      .compact .why-btn::before{
+        width: 8px;
+        height: 8px;
+        margin-right: 10px;
+        flex: 0 0 8px;
+      }
     
-    .compact .submit{
-      font-size: 28px;
-      padding: 12px 14px;
+      /* Submit kleiner */
+      .compact .submit{
+        font-size: 24px;
+        padding: 10px 12px;
+      }
+    
+      .compact .status{
+        margin-top: 8px;
+        font-size: 14px;
+      }
     }
+
 
 
     @media (prefers-reduced-motion: reduce){
@@ -854,4 +881,5 @@
   </script>
 </body>
 </html>
+
 
