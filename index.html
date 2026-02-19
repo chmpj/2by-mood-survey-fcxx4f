@@ -323,10 +323,23 @@
       .tile, .why-btn, .submit{ transition:none; }
       .tile:hover, .why-btn:hover, .submit.enabled:hover{ transform:none; }
     }
+    .corner-logo{
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      height: 48px;          /* 👈 perfekte iPad-Größe */
+      max-width: 40vw;
+      object-fit: contain;
+      opacity: 0.9;          /* leicht dezent */
+      z-index: 1000;         /* immer über allem */
+      pointer-events: none; /* kann nicht angeklickt werden */
+    }
+
   </style>
 </head>
 
 <body>
+  <img src="Logo.png" alt="Logo" class="corner-logo">
   <div class="wrap">
     <h1 id="questionTitle">Wie war dein Tag?</h1>
 
@@ -615,3 +628,4 @@
   </script>
 </body>
 </html>
+
