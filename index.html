@@ -11,8 +11,14 @@
       --text:#0f172a;
       --muted:#64748b;
 
-      /* Brand */
+      /* Brand (fallback) */
       --brand:#3a64b8;
+
+      /* Mode accents (werden per JS überschrieben) */
+      --accent: rgba(56,189,248,.95);   /* morning: sky */
+      --accent2: rgba(14,165,233,.95);
+      --timeGlow: rgba(56,189,248,.12);
+      --timeDot: rgba(56,189,248,.85);
 
       /* Surfaces */
       --surface: rgba(255,255,255,.72);
@@ -36,9 +42,10 @@
       font-family: -apple-system, system-ui, Segoe UI, Roboto, Arial, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(1100px 520px at 50% -120px, var(--timeGlow, rgba(58,100,184,.10)), transparent 60%),
+        radial-gradient(1100px 520px at 50% -120px, var(--timeGlow), transparent 60%),
         linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 40%),
         var(--bg);
+      transition: background 400ms ease;
     }
 
     .wrap{
@@ -60,8 +67,8 @@
       box-shadow: 0 6px 14px rgba(2,6,23,.08);
     }
     #debugBar .dbg.active{
-      border-color: rgba(58,100,184,.55);
-      background: rgba(58,100,184,.12);
+      border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+      background: color-mix(in srgb, var(--accent) 12%, white 88%);
     }
 
     h1{
@@ -72,17 +79,33 @@
       color:#0b1220;
     }
 
+    /* Mode-change micro animation */
+    .mode-swap #questionTitle{
+      animation: titleIn 420ms ease both;
+    }
+    .mode-swap #timeBadge{
+      animation: badgeIn 420ms ease both;
+    }
+    @keyframes titleIn{
+      from{ opacity:0; transform: translateY(-6px); filter: blur(1px); }
+      to  { opacity:1; transform: translateY(0);   filter: blur(0); }
+    }
+    @keyframes badgeIn{
+      from{ opacity:0; transform: translateY(-4px) scale(.98); }
+      to  { opacity:1; transform: translateY(0)   scale(1); }
+    }
+
     .subtle-badge{
       display:inline-flex;
       align-items:center;
       gap:10px;
-      padding: 8px 14px;
+      padding: 10px 16px; /* etwas “pilliniger” */
       border-radius: 999px;
-      background: rgba(255,255,255,.75);
+      background: rgba(255,255,255,.80);
       border: 1px solid rgba(15,23,42,.10);
       box-shadow: 0 6px 16px rgba(2,6,23,.06);
       color: #334155;
-      font-weight: 650;
+      font-weight: 750;
       font-size: 16px;
       margin-bottom: 18px;
       user-select:none;
@@ -90,8 +113,20 @@
     .dot{
       width:10px; height:10px;
       border-radius:999px;
-      background: var(--timeDot, rgba(58,100,184,.75));
-      box-shadow: 0 0 0 3px rgba(58,100,184,.12);
+      background: var(--timeDot);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--timeDot) 18%, transparent);
+    }
+    .badge-icon{
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 14px;
+      background: color-mix(in srgb, var(--accent) 12%, white 88%);
+      border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+      color: #0b1220;
     }
 
     .panel{
@@ -102,6 +137,7 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      transition: box-shadow 400ms ease, border-color 400ms ease;
     }
 
     .mood-grid{
@@ -133,10 +169,10 @@
     .tile:hover{
       transform: translateY(-2px);
       box-shadow: var(--shadow2);
-      border-color: rgba(58,100,184,.35);
+      border-color: color-mix(in srgb, var(--accent) 40%, rgba(15,23,42,.12));
     }
     .tile:focus-visible{
-      outline: 4px solid rgba(58,100,184,.35);
+      outline: 4px solid color-mix(in srgb, var(--accent) 35%, transparent);
       outline-offset: 4px;
     }
     .tile:active{ transform: translateY(-1px) scale(.99); }
@@ -152,7 +188,7 @@
     }
 
     .tile.active{
-      border-color: var(--moodColor, rgba(58,100,184,.70));
+      border-color: var(--moodColor, color-mix(in srgb, var(--accent) 70%, transparent));
       box-shadow: 0 16px 40px rgba(2,6,23,.16);
       background:
         linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.78)),
@@ -239,12 +275,12 @@
     .why-btn:hover{
       transform: translateY(-2px);
       box-shadow: 0 14px 30px rgba(2,6,23,.12);
-      border-color: rgba(58,100,184,.30);
+      border-color: color-mix(in srgb, var(--accent) 30%, rgba(15,23,42,.12));
     }
 
     .why-btn.active{
-      background: rgba(58,100,184,.12);
-      border-color: rgba(58,100,184,.55);
+      background: color-mix(in srgb, var(--accent) 12%, white 88%);
+      border-color: color-mix(in srgb, var(--accent) 55%, transparent);
       box-shadow: 0 16px 40px rgba(2,6,23,.14);
     }
 
@@ -271,9 +307,9 @@
       transition: transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
     }
     .submit.enabled{
-      background: linear-gradient(180deg, rgba(58,100,184,.98), rgba(44,82,166,.98));
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
       color:#fff;
-      border-color: rgba(58,100,184,.55);
+      border-color: color-mix(in srgb, var(--accent) 55%, transparent);
       cursor:pointer;
     }
     .submit.enabled:hover{
@@ -320,34 +356,39 @@
     .compact .submit{ font-size: 30px; padding: 14px 16px; }
 
     @media (prefers-reduced-motion: reduce){
+      body{ transition:none; }
       .tile, .why-btn, .submit{ transition:none; }
       .tile:hover, .why-btn:hover, .submit.enabled:hover{ transform:none; }
+      .mode-swap #questionTitle,
+      .mode-swap #timeBadge{ animation:none; }
     }
+
     .corner-logo{
       position: fixed;
       top: 16px;
       right: 16px;
-      height: 32px;          /* 👈 perfekte iPad-Größe */
+      height: 32px;
       max-width: 40vw;
       object-fit: contain;
-      opacity: 0.75;          /* leicht dezent */
-      z-index: 1000;         /* immer über allem */
-      pointer-events: none; /* kann nicht angeklickt werden */
+      opacity: 0.75;
+      z-index: 1000;
+      pointer-events: none;
     }
     .compact .corner-logo{
       height: 26px;
       opacity: 0.65;
     }
-
   </style>
 </head>
 
 <body>
   <img src="Logo.svg" alt="Logo" class="corner-logo">
+
   <div class="wrap">
     <h1 id="questionTitle">Wie war dein Tag?</h1>
 
     <div class="subtle-badge" id="timeBadge" aria-hidden="true">
+      <span class="badge-icon" id="timeBadgeIcon">🌙</span>
       <span class="dot"></span>
       <span id="timeBadgeText">Check-in</span>
     </div>
@@ -380,7 +421,7 @@
         </div>
       </div>
 
-      <!-- NEU: Wird IMMER gezeigt, sobald Mood=1 gewählt ist (egal Morgen/Nachmittag) -->
+      <!-- (bleibt wie in deinem Referenzcode) -->
       <div id="whySection" class="hidden">
         <h2>Warum?</h2>
         <div class="why-row" id="whyRow">
@@ -412,6 +453,7 @@
     const statusEl = document.getElementById("status");
 
     const timeBadgeText = document.getElementById("timeBadgeText");
+    const timeBadgeIcon = document.getElementById("timeBadgeIcon");
 
     // --- Debug DayPart Override ---------------------------------
     const debugBar = document.getElementById("debugBar");
@@ -457,8 +499,7 @@
         setActive(mode);
 
         // UI refresh ohne reload
-        applyDayPartTheme();
-        setQuestionText();
+        onModeChanged(true); // <-- animiert + setzt Theme/Text
         resetAllSelections();
         updateUIForMood();
         updateSubmitState();
@@ -466,16 +507,52 @@
     }
     // -------------------------------------------------------------
 
+    function setCssVarsForMode(afternoon){
+      // Punkt 1: klare Farb-Unterscheidung
+      if(afternoon){
+        // warm (Nachmittag)
+        document.body.style.setProperty("--accent",  "rgba(245,158,11,.98)");  // amber-500
+        document.body.style.setProperty("--accent2", "rgba(234,88,12,.98)");   // orange-600
+        document.body.style.setProperty("--timeGlow","rgba(245,158,11,.14)");
+        document.body.style.setProperty("--timeDot", "rgba(245,158,11,.88)");
+      } else {
+        // frisch (Morgen)
+        document.body.style.setProperty("--accent",  "rgba(56,189,248,.98)");  // sky-400
+        document.body.style.setProperty("--accent2", "rgba(14,165,233,.98)");  // sky-500
+        document.body.style.setProperty("--timeGlow","rgba(56,189,248,.12)");
+        document.body.style.setProperty("--timeDot", "rgba(56,189,248,.86)");
+      }
+    }
+
     function applyDayPartTheme(){
       const afternoon = isAfternoon();
-      document.body.style.setProperty("--timeGlow", afternoon ? "rgba(245,158,11,.12)" : "rgba(56,189,248,.12)");
-      document.body.style.setProperty("--timeDot",  afternoon ? "rgba(245,158,11,.85)" : "rgba(56,189,248,.85)");
-      timeBadgeText.textContent = afternoon ? "Nachmittag • Tagesrückblick" : "Morgen • kurzer Check-in";
+      setCssVarsForMode(afternoon);
+
+      // Punkt 4: Icon im Badge (Sonne/Mond)
+      timeBadgeIcon.textContent = afternoon ? "🌙" : "☀️";
+
+      // Punkt 2: Pill bleibt (ohne extra Subtitel darunter)
+      timeBadgeText.textContent = afternoon
+        ? "Nachmittag • Tagesrückblick"
+        : "Morgen • kurzer Check-in";
     }
 
     function setQuestionText(){
-      // Frage kann ruhig weiterhin je nach Tageszeit wechseln
       questionTitle.textContent = isAfternoon() ? "Wie war dein Tag?" : "Wie geht es dir?";
+    }
+
+    // Punkt 7: simple, modern micro-animation beim Wechsel
+    function animateModeSwap(){
+      document.body.classList.remove("mode-swap");
+      void document.body.offsetWidth; // reflow für “restart” der Animation
+      document.body.classList.add("mode-swap");
+      setTimeout(() => document.body.classList.remove("mode-swap"), 450);
+    }
+
+    function onModeChanged(animate){
+      applyDayPartTheme();
+      setQuestionText();
+      if(animate) animateModeSwap();
     }
 
     function resetAllSelections(){
@@ -491,7 +568,7 @@
       [...whyRow.querySelectorAll(".why-btn")].forEach(b => b.classList.remove("active"));
     }
 
-    // NEU: Warum immer bei Mood=1 (egal Morgen/Nachmittag)
+    // (wie in deinem Referenzcode)
     function updateUIForMood(){
       const needsWhy = (String(mood) === "1");
 
@@ -505,9 +582,6 @@
       }
     }
 
-    // NEU: Submit-Regeln:
-    // - Mood immer nötig
-    // - Wenn Mood=1 -> Reason immer nötig (egal Morgen/Nachmittag)
     function updateSubmitState(){
       const needsReason = (String(mood) === "1");
       const ok = !!mood && (needsReason ? !!reason : true);
@@ -579,9 +653,7 @@
       fd.append("deviceId", device);
       fd.append("date", formatDateDMY(now));
 
-      // DayPart schicken wir weiterhin (für Auswertung), auch wenn "Warum" nicht mehr davon abhängt
       fd.append("DayPart", isAfternoon() ? "afternoon" : "morning");
-
       fd.append("mood", String(mood));
       fd.append("reason", needsReason ? reason : "");
 
@@ -608,22 +680,19 @@
     }
 
     // Init
-    applyDayPartTheme();
-    setQuestionText();
+    onModeChanged(false);
     initDebugBar();
     scheduleNoonReload();
     updateUIForMood();
     updateSubmitState();
 
-    // DayPart-Wechsel im laufenden Betrieb (für Badge/Hintergrund + Frage)
+    // DayPart-Wechsel im laufenden Betrieb
     let lastAfternoon = isAfternoon();
     setInterval(() => {
       const nowAfternoon = isAfternoon();
       if (nowAfternoon !== lastAfternoon){
         lastAfternoon = nowAfternoon;
-        applyDayPartTheme();
-        setQuestionText();
-        // Optional: ich lasse das Reset drin, damit’s klar bleibt bei Wechsel über Mittag
+        onModeChanged(true); // animiert + setzt neue Farben/Icon/Text
         resetAllSelections();
         updateUIForMood();
         updateSubmitState();
@@ -632,5 +701,3 @@
   </script>
 </body>
 </html>
-
-
